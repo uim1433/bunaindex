@@ -93,7 +93,7 @@ Only `data/data.js`, `index.html`, `README.md` and `sitemap.xml` should change o
 
 Before pushing, serve the folder (`python3 -m http.server 8765`) and load `index.html#finder` and `index.html#directory` with Playwright (Chromium is preinstalled): there must be no page errors and the directory must show the new business count. If that fails, do not push; `git checkout .` and report. Log every metro that was researched and every roaster whose shop was visited, including ones that yielded nothing, so tomorrow moves on.
 
-After pushing, wait two minutes and fetch `https://bunaindex.com/README.md`: it should show the new counts. If it does not after ten minutes, report that the push succeeded but the site had not refreshed.
+After pushing, wait two minutes and fetch `https://bunaindex.com/README.md?v=<short commit hash>` (the query string avoids a cached copy): it should show the new counts. If it does not after ten minutes, report that the push succeeded but the site had not refreshed.
 
 ### 5. Report
 
