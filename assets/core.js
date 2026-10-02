@@ -457,6 +457,8 @@
 
   /* ---------- claim / correction request (no backend in this build: produces a ready-to-send note) ---------- */
   B.CONTACT_URL = 'https://ethico.store/pages/contact';
+  /* The index's own contact address, assembled here so it is not a plain string in the page source. */
+  B.mailHref = (subject, text) => 'mailto:' + ['ethico303', 'gmail.com'].join('@') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text.replace(/\r?\n/g, '\r\n'));
   B.claim = function (i, fix) {
     const co = companies[i];
     const el = modal(fix ? 'Report a correction' : 'Claim this listing', html`
@@ -469,13 +471,13 @@
       </form>
       <div id="claim-out" hidden class="stack" style="--gap:10px">
         <pre class="copy" id="claim-text"></pre>
-        <div class="row"><button class="btn primary" data-copy="#claim-text">Copy the request</button><a class="btn ghost ext" href="${B.CONTACT_URL}" target="_blank" rel="noopener">Open the contact page</a></div>
-        <p class="small muted">Nothing is sent from this page. Copy the request and paste it into the contact page; self-serve claiming opens with member accounts.</p>
+        <div class="row"><a class="btn primary" id="claim-mail" href="#">Email it to us</a><button class="btn ghost" data-copy="#claim-text">Copy the request</button><a class="btn ghost ext" href="${B.CONTACT_URL}" target="_blank" rel="noopener">Open the contact page</a></div>
+        <p class="small muted">“Email it to us” opens the request in your own email, ready to send. Nothing is sent until you press send. If no email app opens, copy the request and paste it into the contact page.</p>
       </div>`);
     B.onSubmit($('#claim-f', el), () => {
       const txt = [fix ? 'CORRECTION REQUEST' : 'LISTING CLAIM', 'Business: ' + co.n, 'Listed as: ' + (TYPE_LABEL[co.t] || '') + (co.city ? ', ' + co.city + ', ' + (co.st || '') : ''), 'Website on record: ' + (co.web || 'none'),
         'From: ' + ($('#cl-name', el).value || '(name)') + ' — ' + ($('#cl-role', el).value || '(role)'), '', $('#cl-note', el).value || '(details)', '', 'Buna Index record ' + co.i + ', index dated ' + fmtDate(TODAY)].join('\n');
-      $('#claim-text', el).textContent = txt; $('#claim-out', el).hidden = false;
+      $('#claim-text', el).textContent = txt; $('#claim-mail', el).href = B.mailHref('Buna Index ' + (fix ? 'correction' : 'claim') + ': ' + co.n, txt); $('#claim-out', el).hidden = false;
     });
   };
 

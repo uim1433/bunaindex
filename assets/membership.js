@@ -19,14 +19,15 @@
 
   B.interest = function (plan) {
     const P = PLANS.find((p) => p.id === plan), me = B.store.get('me', {});
-    const el = B.modal('Tell us you want ' + P.n, html`<p class="muted">Membership is not open yet. Leave a note and you will hear when it is. This writes the note for you; nothing is sent from this page.</p>
+    const el = B.modal('Tell us you want ' + P.n, html`<p class="muted">Membership is not open yet. Leave a note and you will hear when it is. This writes the note and opens it in your own email; nothing is sent until you press send.</p>
       <form id="int-f" class="stack" style="--gap:12px"><div class="two" style="gap:12px"><label class="field"><span>Your name</span><input class="input" id="int-name" autocomplete="name" value="${me.name || ''}"></label><label class="field"><span>Business, if any</span><input class="input" id="int-biz" autocomplete="organization" value="${me.biz || ''}"></label></div>
         <label class="field"><span>What would make it worth paying for?</span><textarea class="input" id="int-note" rows="3"></textarea></label><div class="row"><button class="btn primary" type="submit">Write the note</button></div></form>
-      <div id="int-out" class="stack" style="--gap:10px" hidden><pre class="copy" id="int-text"></pre><div class="row"><button class="btn primary" data-copy="#int-text">Copy</button><a class="btn ghost ext" href="${B.CONTACT_URL}" target="_blank" rel="noopener">Open the contact page</a></div></div>`);
+      <div id="int-out" class="stack" style="--gap:10px" hidden><pre class="copy" id="int-text"></pre><div class="row"><a class="btn primary" id="int-mail" href="#">Email it to us</a><button class="btn ghost" data-copy="#int-text">Copy</button><a class="btn ghost ext" href="${B.CONTACT_URL}" target="_blank" rel="noopener">Open the contact page</a></div></div>`);
     B.onSubmit($('#int-f', el), () => {
       const name = $('#int-name', el).value.trim(), biz = $('#int-biz', el).value.trim();
       B.store.set('me', Object.assign(B.store.get('me', {}), { name, biz }));
       $('#int-text', el).textContent = ['BUNA INDEX MEMBERSHIP INTEREST', 'Plan: ' + P.n + ' (' + P.price + (P.per ? ' ' + P.per : '') + ', proposed)', 'From: ' + (name || '(name)') + (biz ? ', ' + biz : ''), '', $('#int-note', el).value.trim() || '(what would make it worth paying for)'].join('\n');
+      $('#int-mail', el).href = B.mailHref('Buna Index membership interest: ' + P.n, $('#int-text', el).textContent);
       $('#int-out', el).hidden = false;
     });
   };
@@ -78,12 +79,12 @@
         if (t.dataset.tier) { B.setTier(t.dataset.tier); B.toast('Previewing the ' + B.TIER_LABEL[t.dataset.tier] + ' tier'); return B.go('membership', {}); }
         if (t.dataset.plan) return B.interest(t.dataset.plan);
         if (t.id === 'mb-new') {
-          const el = B.modal('Ask to be added', html`<p class="muted">Tell us who you are and where your coffees or offers are published. This writes the request; nothing is sent from this page.</p>
+          const el = B.modal('Ask to be added', html`<p class="muted">Tell us who you are and where your coffees or offers are published. This writes the request and opens it in your own email; nothing is sent until you press send.</p>
             <form id="nw-f" class="stack" style="--gap:12px"><div class="two" style="gap:12px"><label class="field"><span>Business name</span><input class="input" id="nw-n"></label><label class="field"><span>Website</span><input class="input" id="nw-w" inputmode="url" placeholder="https://"></label>
               <label class="field"><span>City and state</span><input class="input" id="nw-c"></label><label class="field"><span>You are a</span><select class="select" id="nw-t"><option>Roaster</option><option>Café</option><option>Importer</option><option>Exporter or producer</option></select></label></div>
               <div class="row"><button class="btn primary" type="submit">Write the request</button></div></form>
-            <div id="nw-out" class="stack" style="--gap:10px" hidden><pre class="copy" id="nw-text"></pre><div class="row"><button class="btn primary" data-copy="#nw-text">Copy</button><a class="btn ghost ext" href="${B.CONTACT_URL}" target="_blank" rel="noopener">Open the contact page</a></div></div>`);
-          B.onSubmit($('#nw-f', el), () => { $('#nw-text', el).textContent = ['NEW LISTING REQUEST', 'Business: ' + ($('#nw-n', el).value || '(name)'), 'Type: ' + $('#nw-t', el).value, 'Where: ' + ($('#nw-c', el).value || '(city, state)'), 'Website: ' + ($('#nw-w', el).value || '(address)'), '', 'Buna Index dated ' + B.fmtDate(B.TODAY)].join('\n'); $('#nw-out', el).hidden = false; });
+            <div id="nw-out" class="stack" style="--gap:10px" hidden><pre class="copy" id="nw-text"></pre><div class="row"><a class="btn primary" id="nw-mail" href="#">Email it to us</a><button class="btn ghost" data-copy="#nw-text">Copy</button><a class="btn ghost ext" href="${B.CONTACT_URL}" target="_blank" rel="noopener">Open the contact page</a></div></div>`);
+          B.onSubmit($('#nw-f', el), () => { $('#nw-text', el).textContent = ['NEW LISTING REQUEST', 'Business: ' + ($('#nw-n', el).value || '(name)'), 'Type: ' + $('#nw-t', el).value, 'Where: ' + ($('#nw-c', el).value || '(city, state)'), 'Website: ' + ($('#nw-w', el).value || '(address)'), '', 'Buna Index dated ' + B.fmtDate(B.TODAY)].join('\n'); $('#nw-mail', el).href = B.mailHref('Buna Index new listing: ' + ($('#nw-n', el).value || 'request'), $('#nw-text', el).textContent); $('#nw-out', el).hidden = false; });
         }
       });
     },
