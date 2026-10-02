@@ -58,7 +58,8 @@
             <p>Order in search, the Finder and the maps cannot be bought. Paid membership adds tools for the business that pays; it does not move that business up a list. If sponsored placements are ever sold they will be labelled as such.</p></section>
 
           <section class="stack" style="--gap:10px"><h2>Your privacy</h2>
-            <p>The site sets no cookies and runs no analytics. Your passport, your shortlist and your settings are kept in your own browser and are not sent anywhere. Clearing your browser data removes them.</p></section>
+            <p>The site sets no cookies and runs no analytics. Your passport, your shortlist and your settings are kept in your own browser and are not sent anywhere. Clearing your browser data removes them.</p>
+            <p>The one exception is an account. If you sign in, your email address and the listings you claim are kept with Supabase, the service that runs sign-in, and your browser keeps a sign-in token until you sign out. Nothing is asked of that service unless you sign in.</p></section>
 
           <section class="stack" style="--gap:10px"><h2>Corrections</h2>
             <p>Every business page carries “This is my business” and “Report a correction”. Both prepare a short request you can send through the <a class="link ext" href="${B.CONTACT_URL}" target="_blank" rel="noopener">contact page</a>. Claiming a listing is free.</p></section>
