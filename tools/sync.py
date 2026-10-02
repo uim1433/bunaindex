@@ -523,6 +523,8 @@ def main():
     ap.add_argument('--emails', action='store_true', help='private preview build only: keep published email addresses')
     ap.add_argument('--bootstrap', action='store_true')
     ap.add_argument('--dry-run', action='store_true')
+    ap.add_argument('--skip', action='append', default=[], help='record id of a list row to keep off the site (repeatable)')
+    ap.add_argument('--skip-business', action='append', default=[], help='business name, as written in the list, to keep off the site (repeatable)')
     ap.add_argument('--force', action='store_true', help='accept a run that removes more than 15 percent of the listings')
     a = ap.parse_args()
 
@@ -568,12 +570,24 @@ def main():
         sys.exit('The list has far fewer businesses than last time (%d against %d). Nothing was changed; check the workbook.'
                  % (len(ros), len(st['biz']) + len(st['bizoff'])))
 
-    # ---- businesses: index, add the new ones
     def site_key(name):
         return nk(alias.get(nk(name), name))
+    for rid in a.skip:
+        st['off'][key10(rid)] = 'manual'
+        st['rows'].pop(key10(rid), None)
+    for name in a.skip_business:
+        st['bizoff'][key10(nk(name))] = 'manual'
+        st['biz'].pop(key10(nk(name)), None)
+
+    # ---- businesses: index, add the new ones
     idx = {nk(c['n']): i for i, c in enumerate(co)}
+    off_idx = set()
     for k, entry in sorted(ros.items()):
         h = bhash(entry)
+        if key10(k) in st['bizoff']:
+            if site_key(entry[0]) in idx:
+                off_idx.add(idx[site_key(entry[0])])
+            continue
         if site_key(entry[0]) in idx:
             i = idx[site_key(entry[0])]
             old = st['biz'].get(key10(k))
@@ -588,8 +602,6 @@ def main():
                 rep['businesses_updated'].append(co[i]['n'])
             st['biz'][key10(k)] = h
             continue
-        if key10(k) in st['bizoff']:
-            continue
         new = build_company(entry[0], entry[1], entry[2], cities, a.emails)
         co.append(new)
         idx[nk(new['n'])] = len(co) - 1
@@ -601,11 +613,11 @@ def main():
     keep = []
     for c in cf:
         row = rows.get(c['id'])
-        if row is None or row['_chain']:
+        if row is None or row['_chain'] or key10(c['id']) in st['off'] or c['c'] in off_idx:
             rep['removed'].append([c['id'], c['n'], co[c['c']]['n']])
             st['rows'].pop(key10(c['id']), None)
             if row is not None:
-                st['off'][key10(c['id'])] = 'chain'
+                st['off'].setdefault(key10(c['id']), 'chain')
             continue
         h = row_hash(row)
         if st['rows'].get(key10(c['id'])) not in (None, h):
@@ -681,7 +693,7 @@ def main():
     # ---- businesses that left the list (and sell nothing on the site) go too
     used = Counter(c['c'] for c in cf)
     on_list = {site_key(v[0]) for v in ros.values()}
-    gone = [i for i, c in enumerate(co) if not used[i] and nk(c['n']) not in on_list]
+    gone = [i for i, c in enumerate(co) if not used[i] and (nk(c['n']) not in on_list or i in off_idx)]
     for i in gone:
         rep['businesses_removed'].append(co[i]['n'])
     if gone:
