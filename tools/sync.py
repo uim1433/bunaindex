@@ -17,6 +17,10 @@ Cleanup rules applied to every new row (the list itself is not edited here):
   recorded once; a catalog reference is skipped when the same seller already has that coffee as a listing.
   A listing with no known quantity or price stays: readers can ask the seller.
 
+Records added by the daily update (tools branch `tooling`, buna_daily.py) carry an added date ("ad") and are
+not on the list yet. They are left alone: never removed for being absent from the list, and a list row that
+repeats one of them (same seller and coffee name, or same product page) is not added a second time.
+
 Only the public columns named in this file are read. Email addresses are never written to the public data.
 State lives in tools/state.json (what has been seen and why a row is off the site) and
 tools/cities.json (city reference points for the map).
@@ -613,6 +617,9 @@ def main():
     keep = []
     for c in cf:
         row = rows.get(c['id'])
+        if row is None and c.get('ad') and c['c'] not in off_idx:
+            keep.append(c)               # added by the daily update; not on the list yet
+            continue
         if row is None or row['_chain'] or key10(c['id']) in st['off'] or c['c'] in off_idx:
             rep['removed'].append([c['id'], c['n'], co[c['c']]['n']])
             st['rows'].pop(key10(c['id']), None)
@@ -642,10 +649,16 @@ def main():
     # ---- listings: add what is new, after the cleanup rules
     listed_names = defaultdict(set)      # business -> names of verified listings
     dup_keys = set()
+    daily = set()                        # (seller, coffee name) and product pages already added by the daily update
     for c in cf:
-        row = rows[c['id']]
+        row = rows.get(c['id'])
         if c['s'] != 'ref':
             listed_names[c['c']].add(words(c['n']))
+        if row is None:
+            daily.add((c['c'], words(c['n'])))
+            if c.get('u'):
+                daily.add(c['u'].split('?')[0].rstrip('/').lower().replace('://www.', '://'))
+            continue
         if row['_src'] == 'G':
             dup_keys.add((nk(company_of(row)), words(lot_name(row)), page_key(row.get('Listing URL')), row['_stock'], str(clean(row.get('Package size')))))
     for rid, row in rows.items():
@@ -669,6 +682,10 @@ def main():
         ci = idx.get(site_key(company)) if company else None
         if not why and ci is not None and row['_src'] == 'G' and status_of(row.get('Availability')) == 'ref' and words(name) in listed_names[ci]:
             why = 'refdup'
+        if not why and daily:
+            u = (first_url(row.get('Listing URL')) or '').split('?')[0].rstrip('/').lower().replace('://www.', '://')
+            if (ci is not None and (ci, words(name)) in daily) or (u and u in daily and re.search(r'/products?/', u)):
+                why = 'daily'
         if why:
             st['off'][key10(rid)] = why
             rep['skipped'][why] += 1
@@ -693,7 +710,7 @@ def main():
     # ---- businesses that left the list (and sell nothing on the site) go too
     used = Counter(c['c'] for c in cf)
     on_list = {site_key(v[0]) for v in ros.values()}
-    gone = [i for i, c in enumerate(co) if not used[i] and (nk(c['n']) not in on_list or i in off_idx)]
+    gone = [i for i, c in enumerate(co) if not used[i] and (nk(c['n']) not in on_list or i in off_idx) and not (c.get('ad') and i not in off_idx)]
     for i in gone:
         rep['businesses_removed'].append(co[i]['n'])
     if gone:
