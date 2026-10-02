@@ -4,7 +4,7 @@
   const B = window.B, { $, $$, html, raw, int, plural, by, fold } = B;
   const PLANS = [
     { id: 'free', n: 'Reader', price: 'Free', who: 'For anyone who drinks coffee', feats: ['The atlas, the finder, flavor matching and the map', 'A passport kept in your browser', 'The source link on every record'] },
-    { id: 'plus', n: 'Passport+', price: '$4', per: 'a month', who: 'For drinkers who keep track', feats: ['Your passport on every device', 'A note when a saved coffee is back in stock', 'New-crop notes for the origins you have stamped', 'A tasting journal'] },
+    { id: 'plus', n: 'Passport+', price: '$40', per: 'a year', who: 'For drinkers who keep track', feats: ['Your passport on every device', 'A note when a saved coffee is back in stock', 'New-crop notes for the origins you have stamped', 'A tasting journal'] },
     { id: 'pro', n: 'Pro', price: '$29', per: 'a month', who: 'For roasters and cafés', feats: ['A claimed, verified listing you edit yourself', 'Your catalog kept in step with your shop', 'Wholesale enquiries sent to your inbox', 'Published email addresses in the directory', 'Price history and alerts', 'Which cities view and save your coffees'] },
     { id: 'trade', n: 'Trade', price: '$149', per: 'a month', who: 'For importers and wholesalers', feats: ['Everything in Pro', 'Your offer list refreshed daily', 'Sample requests routed to your inbox', 'Exports of offers and prospect lists', 'Demand reports: what roasters search and shortlist'] },
     { id: 'data', n: 'Data', price: 'From $99', per: 'a month', who: 'For analysts, lenders and press', feats: ['The index as a data feed', 'The price series, origin by origin', 'A licence to publish from it'] },
