@@ -1,0 +1,48 @@
+{
+ "runs": [
+  {
+   "date": "2026-10-02",
+   "added": {
+    "coffees": 38,
+    "cafes": 29,
+    "importers": 0,
+    "roasters": 0
+   },
+   "short": {
+    "coffees": 12,
+    "cafes": 21,
+    "importers": 20
+   },
+   "index": {
+    "coffees": 3701,
+    "listed": 1806,
+    "refs": 1895,
+    "companies": 933,
+    "origins": 39,
+    "regions": 184,
+    "importers": 82,
+    "roasters": 731,
+    "cafes": 187,
+    "states": 51,
+    "cities": 436
+   },
+   "note": "First run, partly interactive. Tulsa and Richmond only partly covered (4 and 6 cafes); retry them. No importers researched.",
+   "sheet": "created"
+  }
+ ],
+ "cafe_metros_done": [
+  "Boise, ID",
+  "Greenville, SC"
+ ],
+ "roasters_visited": [
+  "PERC Coffee",
+  "Spyhouse Coffee Roasters",
+  "Hex Coffee Roasters",
+  "Metric Coffee Co",
+  "Loyal Coffee",
+  "Repetition Coffee",
+  "Panther Coffee",
+  "Gimme Coffee"
+ ],
+ "importer_sources_done": []
+}
